@@ -1,4 +1,5 @@
 import re
+from os import listdir
 
 
 # Get the difference of two times written in XX:XX format
@@ -17,17 +18,18 @@ roster = f.readlines()
 roster = [roster[x][:-1] for x in range(len(roster))]
 f.close()
 
-# Get filenames
-f = open("files.txt", "r")
-file_list = f.readlines()
-file_list = [file_list[x][:-1] for x in range(len(file_list))]
-f.close()
+# Get directory containing minutes
+minutes = None
+try:
+    minutes = listdir("./minutes")
+except FileNotFoundError:
+    print("Could not find the \"minutes\" directory. Aborting the crawler.\n")
 
-for file in file_list:
-    f = open(file, "r", encoding="utf8")
+for file_name in minutes:
+    f = open("./minutes/{}".format(file_name), "r", encoding="utf8")
     contents = "".join(f.readlines())
     f.close()
-    print("Data from minutes recorded in {}\n".format(file))
+    print("Data from minutes recorded in {}\n".format(file_name))
 
     # Find meeting length
     # Assumes all meetings are less than 12 hours, which is very reasonable
@@ -50,7 +52,6 @@ for file in file_list:
 
     pattern = r'[^\n]+\([0-9]{1,2}:[0-9]{2}'
     times = re.findall(pattern, contents)
-    print(times)
     start = start_time
     next_section = 'M'
     for section in times:
